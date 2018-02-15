@@ -2,6 +2,7 @@
 #Usage: -d(--directory) - set name of the directory
 #				-a(--archive) - set name of archive(default - directory)
 #				-e(--extension) - set extension
+HELP=$'Usage:\n-d(--directory) - set name of the directory\n-a(--archive) - set name of archive (default - name of directory)\n-e(--extension) - set extension\n-h(--help) - show this massage'
 while [[ $# -gt 0 ]]
 do
 key="$1"
@@ -21,16 +22,25 @@ case $key in
     shift 
     shift 
     ;;
+	-h|--help)
+		echo "$HELP"
+		exit 0 
+		;;
 	*)
-		echo "Invalid arguments. Usage:
--d(--directory) - set name of the directory
--a(--archive) - set name of archive(default - directory)
--e(--extension) - set extension
-"
+		echo "Invalid arguments. $HELP"
 		exit 1
 esac
 done
-mkdir $DIRECTORY
-find ~/ -path $(pwd $DIRECTORY) -prune -o -type f -name "*.$EXTENSION" -exec cp {} $DIRECTORY \;
+if [ -z ${DIRECTORY+x} ] || [ -z ${EXTENSION+x} ]
+then
+		echo "Invalid arguments. $HELP"
+		exit 1
+	fi
+if [ -z ${ARCHIVE+x} ]
+then
+	ARCHIVE=$(basename $DIRECTORY)
+fi
+mkdir -p $DIRECTORY
+find ~/ -path $(pwd $DIRECTORY) -prune -o -type f -name "*.$EXTENSION" -exec sh -c 'dir1=$(dirname "$0" );dir=$(realpath --relative-to=$HOME $dir1); mkdir -p "$1/$dir";cp "$0" "$1/$dir"' {} $DIRECTORY \;
 tar -cf $ARCHIVE.tar $DIRECTORY
 echo done
