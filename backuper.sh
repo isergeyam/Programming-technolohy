@@ -8,7 +8,7 @@ do
 key="$1"
 case $key in
     -e|--extension)
-    EXTENSION="$2"
+    EXTENSION="$EXTENSION$2\\|"
     shift 
     shift 
     ;;
@@ -40,7 +40,9 @@ if [ -z ${ARCHIVE+x} ]
 then
 	ARCHIVE=$(basename $DIRECTORY)
 fi
+EXTENSION=".*\.\($EXTENSION\\)"
+#echo "$EXTENSION"
 mkdir -p $DIRECTORY
-find ~/ -path $(pwd $DIRECTORY) -prune -o -type f -name "*.$EXTENSION" -exec sh -c 'dir1=$(dirname "$0" );dir=$(realpath --relative-to=$HOME $dir1); mkdir -p "$1/$dir";cp "$0" "$1/$dir"' {} $DIRECTORY \;
+find $HOME -path $(realpath $DIRECTORY) -prune -o -type f -regextype sed -regex "$EXTENSION" -exec sh -c 'dir1=$(dirname "$0" );dir=$(realpath --relative-to=$HOME $dir1); mkdir -p "$1/$dir";cp "$0" "$1/$dir"' {} $DIRECTORY \;
 tar -cf $ARCHIVE.tar $DIRECTORY
 echo done
