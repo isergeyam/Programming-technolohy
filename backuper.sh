@@ -1,7 +1,3 @@
-#!/bin/bash
-#Usage: -d(--directory) - set name of the directory
-#				-a(--archive) - set name of archive(default - directory)
-#				-e(--extension) - set extension
 HELP=$'Usage:\n-d(--directory) - set name of the directory\n-a(--archive) - set name of archive (default - name of directory)\n-e(--extension) - set extension\n-h(--help) - show this massage'
 while [[ $# -gt 0 ]]
 do
@@ -41,7 +37,6 @@ then
 	ARCHIVE=$(basename $DIRECTORY)
 fi
 EXTENSION=".*\.\($EXTENSION\\)"
-#echo "$EXTENSION"
 mkdir -p $DIRECTORY
 find $HOME -path $(realpath $DIRECTORY) -prune -o -type f -regextype sed -regex "$EXTENSION" -exec sh -c 'dir1=$(dirname "$0" );dir=$(realpath --relative-to=$HOME $dir1); mkdir -p "$1/$dir";cp "$0" "$1/$dir"' {} $DIRECTORY \;
 tar -cf $ARCHIVE.tar $DIRECTORY
